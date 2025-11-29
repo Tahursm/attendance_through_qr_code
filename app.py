@@ -1,0 +1,113 @@
+from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
+from config import config
+from models import db
+import os
+import ssl
+
+# Import blueprints
+from routes.student_routes import student_bp
+from routes.teacher_routes import teacher_bp
+from routes.attendance_routes import attendance_bp
+
+
+def create_app(config_name='development'):
+    """Application factory"""
+    app = Flask(__name__, static_folder='static', static_url_path='')
+    
+    # Load configuration
+    app.config.from_object(config[config_name])
+    
+    # Enable CORS
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
+    # Initialize database
+    db.init_app(app)
+    
+    # Register blueprints
+    app.register_blueprint(student_bp, url_prefix='/api/student')
+    app.register_blueprint(teacher_bp, url_prefix='/api/teacher')
+    app.register_blueprint(attendance_bp, url_prefix='/api/attendance')
+    
+    # Health check endpoint
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        return jsonify({'status': 'healthy', 'message': 'API is running'}), 200
+    
+    # Serve frontend pages
+    @app.route('/')
+    def index():
+        return send_from_directory('static', 'index.html')
+    
+    @app.route('/student/dashboard')
+    def student_dashboard():
+        return send_from_directory('static', 'student_dashboard.html')
+    
+    @app.route('/teacher/dashboard')
+    def teacher_dashboard():
+        return send_from_directory('static', 'teacher_dashboard.html')
+    
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({'error': 'Resource not found'}), 404
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        return jsonify({'error': 'Internal server error'}), 500
+    
+    return app
+
+
+def create_ssl_context():
+    """Create SSL context for HTTPS"""
+    try:
+        # Try to create SSL context with adhoc certificate
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain('adhoc')
+        return context
+    except Exception as e:
+        print(f"Warning: Could not create SSL context: {e}")
+        print("Falling back to HTTP mode")
+        return None
+
+
+if __name__ == '__main__':
+    app = create_app()
+    
+    # Create tables if they don't exist
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully!")
+        except Exception as e:
+            print(f"Error creating tables: {e}")
+    
+    # Check if SSL is enabled
+    ssl_enabled = app.config.get('SSL_ENABLED', False)
+    ssl_context = None
+    
+    if ssl_enabled:
+        print("🔒 SSL/HTTPS mode enabled")
+        ssl_context = create_ssl_context()
+        
+        if ssl_context:
+            print("✅ HTTPS server starting...")
+            print("🌐 Access via: https://your-ip:5000")
+        else:
+            print("⚠️ SSL context creation failed, falling back to HTTP")
+    else:
+        print("🔓 HTTP mode (development)")
+        print("💡 To enable HTTPS: Set SSL_ENABLED=true in .env")
+    
+    # Run the application
+    try:
+        if ssl_context:
+            app.run(debug=True, host='0.0.0.0', port=5000, ssl_context=ssl_context)
+        else:
+            app.run(debug=True, host='0.0.0.0', port=5000)
+    except Exception as e:
+        print(f"Error starting server: {e}")
+        print("Trying HTTP mode...")
+        app.run(debug=True, host='0.0.0.0', port=5000)
+

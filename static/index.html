@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Attendance">
+    <meta name="description" content="Smart College Attendance System with QR Code based tracking">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="manifest" href="/manifest.json">
+    <title>Smart Attendance System - QR Code Based</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="landing-page">
+        <div class="landing-container">
+            <div class="header">
+                <h1>🎓 Smart College Attendance System</h1>
+                <p>Secure QR Code Based Attendance Tracking</p>
+            </div>
+
+            <!-- Role Selection Screen -->
+            <div id="roleSelectionScreen" class="role-selection">
+                <div class="role-selection-container">
+                    <h2>Choose Your Role</h2>
+                    <p>Select how you want to access the system</p>
+                    <div class="role-buttons">
+                        <button class="role-btn student-role-btn" onclick="selectRole('student')">
+                            <div class="role-icon">👨‍🎓</div>
+                            <h3>I am a Student</h3>
+                            <p>Access your attendance and profile</p>
+                        </button>
+                        <button class="role-btn teacher-role-btn" onclick="selectRole('teacher')">
+                            <div class="role-icon">👨‍🏫</div>
+                            <h3>I am a Teacher</h3>
+                            <p>Manage attendance and classes</p>
+                        </button>
+                    </div>
+                    <div class="back-to-roles" style="display: none;">
+                        <button class="btn btn-secondary" onclick="showRoleSelection()">
+                            ← Back to Role Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loginCards" class="login-cards" style="display: none;">
+                <!-- Student Login/Register Card -->
+                <div id="studentCard" class="card student-portal" style="display: none;">
+                    <div class="card-header">
+                        <div class="portal-header">
+                            <button class="back-to-roles-btn" onclick="showRoleSelection()" title="Back to Role Selection">
+                                ← Back
+                            </button>
+                            <div class="portal-title">
+                                <h2>👨‍🎓 Student Portal</h2>
+                                <p>Access your attendance and profile</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="studentLoginAlert"></div>
+
+                    <!-- Student Login Form -->
+                    <div id="studentLoginForm">
+                        <div class="form-group">
+                            <label for="studentEmail">Email</label>
+                            <input type="email" id="studentEmail" placeholder="student@college.edu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentPassword">Password</label>
+                            <input type="password" id="studentPassword" placeholder="Enter password" required>
+                        </div>
+                        <button class="btn btn-primary" onclick="studentLogin()">Login</button>
+                        <div class="toggle-form">
+                            <p>Don't have an account? <a href="#" onclick="showStudentRegister()">Register here</a></p>
+                        </div>
+                    </div>
+
+                    <!-- Student Registration Form -->
+                    <div id="studentRegisterForm" class="hidden">
+                        <div class="form-group">
+                            <label for="regStudentId">Student ID</label>
+                            <input type="text" id="regStudentId" placeholder="STU2024001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentName">Full Name</label>
+                            <input type="text" id="regStudentName" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentEmail">Email</label>
+                            <input type="email" id="regStudentEmail" placeholder="student@college.edu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentPassword">Password</label>
+                            <input type="password" id="regStudentPassword" placeholder="Min 8 characters" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentBranch">Branch</label>
+                            <select id="regStudentBranch" required>
+                                <option value="">Select Branch</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Civil">Civil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentSemester">Semester</label>
+                            <select id="regStudentSemester" required>
+                                <option value="">Select Semester</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentYear">Year</label>
+                            <select id="regStudentYear" required>
+                                <option value="">Select Year</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                                <option value="2021">2021</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regStudentPhone">Phone</label>
+                            <input type="tel" id="regStudentPhone" placeholder="9876543210">
+                        </div>
+                        
+                        <button id="studentRegisterBtn" class="btn btn-success" onclick="studentRegister()">Register</button>
+                        <div class="toggle-form">
+                            <p>Already have an account? <a href="#" onclick="showStudentLogin()">Login here</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Login Card -->
+                <div id="teacherCard" class="card teacher-portal" style="display: none;">
+                    <div class="card-header">
+                        <div class="portal-header">
+                            <button class="back-to-roles-btn" onclick="showRoleSelection()" title="Back to Role Selection">
+                                ← Back
+                            </button>
+                            <div class="portal-title">
+                                <h2>👨‍🏫 Teacher Portal</h2>
+                                <p>Manage attendance and classes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="teacherLoginAlert"></div>
+
+                    <div id="teacherLoginForm">
+                        <div class="form-group">
+                            <label for="teacherEmail">Email</label>
+                            <input type="email" id="teacherEmail" placeholder="teacher@college.edu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherPassword">Password</label>
+                            <input type="password" id="teacherPassword" placeholder="Enter password" required>
+                        </div>
+                        <button class="btn btn-primary" onclick="teacherLogin()">Login</button>
+                        <div class="toggle-form">
+                            <p style="margin-top: 1rem; font-size: 0.875rem;">
+                                Demo: dr.sharma@college.edu / password123
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/mobile-utils.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // Role-based access control
+        let currentRole = null;
+        
+        function selectRole(role) {
+            currentRole = role;
+            
+            // Hide role selection screen
+            document.getElementById('roleSelectionScreen').style.display = 'none';
+            
+            // Show login cards
+            document.getElementById('loginCards').style.display = 'block';
+            
+            // Show only the selected role's portal
+            if (role === 'student') {
+                document.getElementById('studentCard').style.display = 'block';
+                document.getElementById('teacherCard').style.display = 'none';
+                // Add fade-in animation
+                document.getElementById('studentCard').classList.add('fade-in');
+            } else if (role === 'teacher') {
+                document.getElementById('studentCard').style.display = 'none';
+                document.getElementById('teacherCard').style.display = 'block';
+                // Add fade-in animation
+                document.getElementById('teacherCard').classList.add('fade-in');
+            }
+            
+            // Show back button
+            document.querySelector('.back-to-roles').style.display = 'block';
+        }
+        
+        function showRoleSelection() {
+            // Clear any alerts
+            document.getElementById('studentLoginAlert').innerHTML = '';
+            document.getElementById('teacherLoginAlert').innerHTML = '';
+            
+            // Hide login cards with fade-out animation
+            const loginCards = document.getElementById('loginCards');
+            loginCards.classList.add('fade-out');
+            
+            setTimeout(() => {
+                loginCards.style.display = 'none';
+                loginCards.classList.remove('fade-out');
+                
+                // Show role selection screen
+                document.getElementById('roleSelectionScreen').style.display = 'block';
+                document.querySelector('.back-to-roles').style.display = 'none';
+                
+                // Reset forms
+                document.getElementById('studentLoginForm').classList.remove('hidden');
+                document.getElementById('studentRegisterForm').classList.add('hidden');
+                
+                // Clear form data
+                clearForms();
+                
+                currentRole = null;
+            }, 300);
+        }
+        
+        function clearForms() {
+            // Clear student forms
+            document.getElementById('studentEmail').value = '';
+            document.getElementById('studentPassword').value = '';
+            document.getElementById('regStudentId').value = '';
+            document.getElementById('regStudentName').value = '';
+            document.getElementById('regStudentEmail').value = '';
+            document.getElementById('regStudentPassword').value = '';
+            document.getElementById('regStudentBranch').value = '';
+            document.getElementById('regStudentSemester').value = '';
+            document.getElementById('regStudentYear').value = '';
+            document.getElementById('regStudentPhone').value = '';
+            
+            // Enable the register button (it should be enabled by default)
+            const mainRegisterBtn = document.getElementById('studentRegisterBtn');
+            if (mainRegisterBtn) {
+                mainRegisterBtn.disabled = false;
+                mainRegisterBtn.innerHTML = 'Register';
+            }
+            
+            // Clear teacher forms
+            document.getElementById('teacherEmail').value = '';
+            document.getElementById('teacherPassword').value = '';
+        }
+        
+        // Enhanced security: prevent role switching during authentication
+        function preventRoleSwitch() {
+            if (currentRole) {
+                // Disable the other role's card completely
+                const otherCard = currentRole === 'student' ? 
+                    document.getElementById('teacherCard') : 
+                    document.getElementById('studentCard');
+                otherCard.style.display = 'none';
+                otherCard.style.pointerEvents = 'none';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show role selection by default
+            showRoleSelection();
+        });
+    </script>
+</body>
+</html>
+
