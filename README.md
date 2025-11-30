@@ -27,7 +27,7 @@ A comprehensive web-based attendance management system that uses dynamic QR code
 - ✅ **Haptic Feedback** - Vibration feedback for actions
 - ✅ **Screen Wake Lock** - Keep screen on during QR scanning
 - ✅ **Network Detection** - Real-time online/offline status
-- 📖 **[Quick Mobile Setup →](MOBILE_SETUP.md)** | **[Full Mobile Guide →](docs/MOBILE_GUIDE.md)**
+- 📖 **[Mobile Guide →](docs/MOBILE_GUIDE.md)**
 
 ### Student Portal
 - ✅ Student registration and login
@@ -137,7 +137,6 @@ attendance-qr-system/
 │   ├── PHONE_FINGERPRINT_GUIDE.md  # Phone fingerprint sensor guide
 │   └── ER_DIAGRAM.md               # Database ER diagram
 │
-├── MOBILE_SETUP.md                 # Quick mobile setup guide
 ├── test-phone-fingerprint.html     # Fingerprint sensor test page
 └── phone-fingerprint-quickstart.html  # Quick start guide for students
 ```
@@ -182,7 +181,7 @@ Create a `.env` file in the root directory:
 
 ```bash
 # Quick HTTPS setup (recommended for phone fingerprint support)
-python enable_https.py
+# Set SSL_ENABLED=true in .env file
 
 # OR manually create .env file:
 ```
@@ -275,7 +274,7 @@ The application will start on `http://localhost:5000`
 ### 📱 Mobile Access with Fingerprint Support
 
 **For mobile users with fingerprint sensors:**
-1. **Enable HTTPS**: Run `python enable_https.py` or set `SSL_ENABLED=true` in .env
+1. **Enable HTTPS**: Set `SSL_ENABLED=true` in .env file
 2. **Start server**: `python app.py`
 3. **Open phone browser**: Navigate to `https://your-server-ip:5000`
 4. **Accept certificate**: Click "Advanced" → "Proceed to site" (for self-signed cert)
@@ -286,7 +285,7 @@ The application will start on `http://localhost:5000`
 - **Android**: Chrome or Edge browser
 - **iPhone**: Safari browser (required!)
 
-**Quick Setup:** See [HTTPS_SETUP_GUIDE.md](HTTPS_SETUP_GUIDE.md) for detailed HTTPS instructions.
+**Quick Setup:** Set `SSL_ENABLED=true` in your `.env` file. See [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md) for detailed instructions.
 
 ## 📖 Usage Guide
 
@@ -455,8 +454,15 @@ Clean, modern interface with student and teacher login portals
 
 **Students:**
 ```
-Email: john.doe@college.edu
-Password: password123
+Email: rahul.sharma@gmail.com
+Password: student123
+
+Other students (Division A & B):
+- priya.patel@gmail.com / student123
+- arjun.kumar@gmail.com / student123
+- karan.desai@gmail.com / student123
+- neha.mehta@gmail.com / student123
+(All use password: student123)
 ```
 
 **Teachers:**
@@ -540,3 +546,4 @@ For issues, questions, or suggestions:
 
 **Note:** This is an educational project. For production deployment, additional security measures and optimizations are recommended.
 
+# attendance_through_qr_code
