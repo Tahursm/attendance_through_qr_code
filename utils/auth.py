@@ -36,14 +36,37 @@ def generate_token(user_id, user_type):
     Generate JWT token for authenticated user
     user_type: 'student' or 'teacher'
     """
-    payload = {
-        'user_id': user_id,
-        'user_type': user_type,
-        'exp': datetime.utcnow() + timedelta(hours=Config.JWT_EXPIRY_HOURS),
-        'iat': datetime.utcnow()
-    }
-    token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
-    return token
+    try:
+        # Get secret key from Config class or environment
+        secret_key = Config.SECRET_KEY
+        if not secret_key or secret_key == 'dev-secret-key-change-in-production':
+            # Fallback to environment variable
+            import os
+            secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+        
+        # Get JWT expiry hours
+        jwt_expiry = getattr(Config, 'JWT_EXPIRY_HOURS', 24)
+        
+        payload = {
+            'user_id': user_id,
+            'user_type': user_type,
+            'exp': datetime.utcnow() + timedelta(hours=jwt_expiry),
+            'iat': datetime.utcnow()
+        }
+        
+        # Encode token - handle both string and bytes return
+        token = jwt.encode(payload, secret_key, algorithm='HS256')
+        
+        # PyJWT 2.0+ returns a string, older versions return bytes
+        if isinstance(token, bytes):
+            token = token.decode('utf-8')
+        
+        return token
+    except Exception as e:
+        print(f"Error generating token: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise Exception(f"Failed to generate token: {str(e)}")
 
 
 def decode_token(token):
