@@ -106,9 +106,12 @@ async function apiCall(endpoint, method = 'GET', body = null, requiresAuth = fal
         'Content-Type': 'application/json'
     };
 
+    // Declare token at function scope so it's accessible in error handlers
+    let token = null;
+
     if (requiresAuth) {
         // Try multiple times to get token (in case of timing issues)
-        let token = getAuthToken();
+        token = getAuthToken();
         
         // If token is null, try direct localStorage access
         if (!token) {
@@ -319,11 +322,13 @@ async function apiCall(endpoint, method = 'GET', body = null, requiresAuth = fal
             
             // Handle authentication errors
             if (response.status === 401 || response.status === 403) {
+                // Get token for logging (might not exist if this is a login call)
+                const currentToken = token || getAuthToken();
                 console.error('Authentication error detected:', {
                     status: response.status,
                     error: errorData.error,
                     details: errorData.details,
-                    currentToken: token ? token.substring(0, 20) + '...' : 'NONE',
+                    currentToken: currentToken ? currentToken.substring(0, 20) + '...' : 'NONE',
                     currentUserType: getUserType()
                 });
                 
