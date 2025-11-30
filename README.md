@@ -547,3 +547,4 @@ For issues, questions, or suggestions:
 **Note:** This is an educational project. For production deployment, additional security measures and optimizations are recommended.
 
 # attendance_through_qr_code
+# attendance_through_qr_code
