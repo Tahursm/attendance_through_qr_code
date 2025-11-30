@@ -164,6 +164,146 @@ body {
     border-color: var(--primary-color);
 }
 
+/* Password Input Wrapper */
+.password-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-wrapper input {
+    padding-right: 3rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    z-index: 10;
+    /* Touch optimizations */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 40px;
+    min-height: 40px;
+    border-radius: 50%;
+    outline: none;
+}
+
+.password-toggle-btn:hover {
+    background-color: rgba(60, 64, 67, 0.08);
+}
+
+.password-toggle-btn:not(.active):hover {
+    color: #9aa0a6; /* Keep grey when password is hidden */
+}
+
+.password-toggle-btn.active:hover {
+    color: #202124; /* Normal color when password is visible */
+}
+
+.password-toggle-btn:focus {
+    background-color: rgba(60, 64, 67, 0.08);
+}
+
+.password-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95);
+    background-color: rgba(60, 64, 67, 0.12);
+}
+
+.password-toggle-btn .eye-icon {
+    display: block;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+}
+
+.password-toggle-btn .eye-icon-path {
+    fill: currentColor;
+    transition: opacity 0.2s ease, fill 0.2s ease;
+}
+
+.password-toggle-btn .eye-icon-show,
+.password-toggle-btn .eye-icon-hide {
+    transition: opacity 0.2s ease, fill 0.2s ease;
+    opacity: 1;
+}
+
+/* Base transition for strike-through pseudo-element */
+.password-toggle-btn::after {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Default state: password is hidden - show grey hide icon (slashed eye) with strike-through */
+.password-toggle-btn:not(.active) .eye-icon-show {
+    display: none !important;
+    opacity: 0;
+}
+
+.password-toggle-btn:not(.active) .eye-icon-hide {
+    display: block !important;
+    fill: #9aa0a6 !important; /* Grey color when password is hidden */
+    opacity: 1;
+}
+
+/* Add diagonal strike-through for hidden password state using pseudo-element on button */
+.password-toggle-btn:not(.active)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 2px;
+    background-color: #9aa0a6;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transform-origin: center;
+    pointer-events: none;
+    z-index: 11;
+    opacity: 1;
+}
+
+/* Active state: password is visible - show normal show icon (open eye) */
+.password-toggle-btn.active .eye-icon-show {
+    display: block !important;
+    fill: currentColor !important; /* Normal color when password is visible */
+    opacity: 1;
+}
+
+.password-toggle-btn.active .eye-icon-hide {
+    display: none !important;
+    opacity: 0;
+}
+
+.password-toggle-btn.active::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(45deg) scale(0);
+    pointer-events: none;
+}
+
+/* Mobile optimizations for password toggle */
+@media (max-width: 768px) {
+    .password-toggle-btn {
+        right: 0.5rem;
+        padding: 0.5rem;
+        font-size: 1.125rem;
+    }
+    
+    .password-input-wrapper input {
+        padding-right: 2.75rem;
+    }
+}
+
 .btn {
     width: 100%;
     padding: 0.875rem;
@@ -488,6 +628,19 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0);
+        max-height: 500px;
+    }
+}
+
 /* Session Creation Step-by-Step */
 .info-grid .form-group label {
     font-weight: 600;
@@ -670,29 +823,34 @@ body {
     
     /* Dashboard Mobile */
     .dashboard-container {
-        padding: 1rem;
+        padding: 0.75rem;
     }
     
     .dashboard-header h1 {
-        font-size: 1.375rem;
+        font-size: 1.25rem;
+        line-height: 1.3;
     }
     
     .dashboard-header p {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
     }
     
     /* Navbar Mobile */
     .navbar {
-        padding: 0.75rem 1rem;
+        padding: 0.75rem;
         flex-wrap: wrap;
+        gap: 0.5rem;
     }
     
     .navbar-brand {
-        font-size: 1rem;
+        font-size: 0.9375rem;
+        flex: 1;
+        min-width: 0;
     }
     
     .navbar-user {
         gap: 0.5rem;
+        flex-wrap: wrap;
     }
     
     .navbar-user span {
@@ -700,8 +858,9 @@ body {
     }
     
     .btn-logout {
-        padding: 0.5rem 0.875rem;
-        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+        min-height: 36px;
     }
     
     /* Stats Cards Mobile */
@@ -726,6 +885,11 @@ body {
     .section-card h2 {
         font-size: 1.125rem;
         margin-bottom: 1rem;
+        word-break: break-word;
+    }
+    
+    .section-card h3 {
+        font-size: 1rem;
     }
     
     /* Forms Mobile */
@@ -742,11 +906,68 @@ body {
     .form-group select {
         padding: 0.75rem;
         font-size: 16px; /* Prevents zoom */
+        min-height: 48px;
     }
     
     .btn {
-        padding: 0.75rem;
+        padding: 0.75rem 1rem;
         font-size: 0.9375rem;
+        min-height: 44px;
+    }
+    
+    /* Table improvements for very small screens */
+    .table-responsive {
+        margin: 0 -0.75rem;
+        padding: 0 0.75rem;
+    }
+    
+    .table {
+        min-width: 900px; /* Wider for sessions table */
+        font-size: 0.75rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.375rem;
+        font-size: 0.75rem;
+    }
+    
+    .table th {
+        font-size: 0.6875rem;
+    }
+    
+    .table .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+        min-height: 32px;
+    }
+    
+    /* Badge mobile */
+    .badge {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.6875rem;
+    }
+    
+    /* Action buttons container - stack vertically on mobile */
+    .table td:last-child {
+        white-space: normal;
+        min-width: 120px;
+    }
+    
+    .table td:last-child > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .table td:last-child .btn {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* Manage Session column */
+    .table td:nth-last-child(2) {
+        min-width: 100px;
     }
     
     /* QR Code Mobile */
@@ -758,8 +979,12 @@ body {
         padding: 1rem;
     }
     
+    .qr-code-display img {
+        max-width: 200px;
+    }
+    
     .qr-timer {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
     }
     
     /* Scanner Mobile */
@@ -776,6 +1001,453 @@ body {
     #qr-reader {
         max-width: 100%;
         border-width: 2px;
+    }
+    
+    /* Modal mobile optimization */
+    .modal-overlay {
+        padding: 0;
+        align-items: stretch;
+        /* Prevent body scroll when modal is open */
+        position: fixed;
+        /* Allow scrolling in all directions */
+        touch-action: pan-y pan-x;
+        pointer-events: auto;
+        /* Smooth scrolling */
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    body.modal-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        /* Prevent touch scrolling on body when modal is open */
+        touch-action: none;
+    }
+    
+    .modal-content {
+        margin: 0;
+        padding: 0.75rem;
+        border-radius: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+        /* Prevent zoom on input focus */
+        font-size: 16px;
+        /* Ensure proper scaling */
+        transform: scale(1);
+        -webkit-transform: scale(1);
+        /* Allow scrolling in all directions */
+        touch-action: pan-y pan-x;
+        pointer-events: auto;
+        /* Smooth scrolling */
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    .modal-content h2 {
+        font-size: 1.125rem;
+        padding-right: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+    
+    .modal-content h3 {
+        font-size: 0.9375rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    /* Modal sections */
+    .modal-content > div[style*="display: grid"] {
+        gap: 1rem !important;
+    }
+    
+    /* Session Information section */
+    .modal-content > div > div[style*="background: #f3f4f6"] {
+        padding: 1rem !important;
+    }
+    
+    .modal-content > div > div[style*="background: #f3f4f6"] > div[style*="display: grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    /* Statistics Cards */
+    .modal-content > div > div[style*="display: grid"][style*="grid-template-columns: repeat(auto-fit"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+    }
+    
+    .modal-content > div > div[style*="background: #dbeafe"],
+    .modal-content > div > div[style*="background: #fee2e2"],
+    .modal-content > div > div[style*="background: #f3f4f6"],
+    .modal-content > div > div[style*="background: #d1fae5"],
+    .modal-content > div > div[style*="background: #fef3c7"] {
+        padding: 1rem !important;
+        /* Ensure text is visible */
+        min-height: 100px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    
+    .modal-content > div > div[style*="font-size: 2rem"],
+    .modal-content > div > div[style*="font-size: 1.5rem"] {
+        font-size: 1.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Ensure stat card labels are visible */
+    .modal-content > div > div[style*="background: #dbeafe"] > div:last-child,
+    .modal-content > div > div[style*="background: #fee2e2"] > div:last-child,
+    .modal-content > div > div[style*="background: #f3f4f6"] > div:last-child,
+    .modal-content > div > div[style*="background: #d1fae5"] > div:last-child,
+    .modal-content > div > div[style*="background: #fef3c7"] > div:last-child {
+        font-size: 0.875rem !important;
+        line-height: 1.3 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    /* Progress bar */
+    .modal-content > div > div[style*="height: 30px"] {
+        height: 24px !important;
+    }
+    
+    /* Attendance Report */
+    .modal-content > div > div > h3 {
+        font-size: 0.9375rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .modal-content > div > div > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+    
+    .modal-content > div > div > div[style*="background: #dbeafe"],
+    .modal-content > div > div > div[style*="background: #fee2e2"] {
+        padding: 0.75rem !important;
+    }
+    
+    /* Attendance table */
+    .modal-content table {
+        font-size: 0.75rem !important;
+        width: 100%;
+        /* Ensure table is touchable */
+        touch-action: manipulation;
+    }
+    
+    .modal-content table th,
+    .modal-content table td {
+        padding: 0.5rem 0.375rem !important;
+        font-size: 0.75rem !important;
+        /* Ensure cells are touchable */
+        touch-action: manipulation;
+        pointer-events: auto;
+    }
+    
+    .modal-content table th {
+        font-size: 0.6875rem !important;
+        white-space: nowrap !important;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 5;
+    }
+    
+    .modal-content table td {
+        word-break: break-word;
+    }
+    
+    /* Marked At column visibility */
+    .modal-content table th:last-child,
+    .modal-content table td:last-child {
+        min-width: 140px !important;
+        white-space: nowrap !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* Ensure all interactive elements in modal are touchable */
+    .modal-content button,
+    .modal-content .btn {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(37, 99, 235, 0.2);
+        pointer-events: auto;
+        min-height: 44px;
+        min-width: 44px;
+        /* Prevent text selection on touch */
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    .modal-content button:active,
+    .modal-content .btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+    
+    /* Ensure table-responsive in modal allows horizontal scroll */
+    .modal-content .table-responsive {
+        touch-action: pan-y pan-x !important;
+        -webkit-overflow-scrolling: touch !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        display: block !important;
+        position: relative !important;
+        /* Add scroll indicator */
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    /* Ensure table in modal is scrollable */
+    .modal-content .table-responsive .table {
+        width: 100% !important;
+        min-width: 700px !important;
+        table-layout: auto !important;
+    }
+    
+    /* Ensure all columns are visible */
+    .modal-content .table-responsive .table th,
+    .modal-content .table-responsive .table td {
+        white-space: nowrap !important;
+    }
+    
+    /* Marked At column specific styling */
+    .modal-content .table-responsive .table th:last-child,
+    .modal-content .table-responsive .table td:last-child {
+        min-width: 140px !important;
+        white-space: nowrap !important;
+        font-size: 0.7rem !important;
+    }
+    
+    /* Make sure modal content itself is scrollable */
+    .modal-content {
+        touch-action: pan-y pan-x;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* Ensure table-responsive in modal allows horizontal scroll */
+    .modal-content .table-responsive {
+        touch-action: pan-x pan-y !important;
+        -webkit-overflow-scrolling: touch !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        width: 100% !important;
+        display: block !important;
+        position: relative !important;
+        /* Force horizontal scrolling */
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+        /* Prevent vertical scroll on this element */
+        max-height: none !important;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 5px;
+        margin: 5px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+    }
+    
+    .modal-content .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    /* Horizontal scrollbar only */
+    .modal-content .table-responsive::-webkit-scrollbar:vertical {
+        display: none;
+    }
+    
+    /* Ensure table in modal is scrollable */
+    .modal-content .table-responsive .table {
+        width: 100% !important;
+        min-width: 700px !important;
+        table-layout: auto !important;
+    }
+    
+    /* Ensure all columns are visible */
+    .modal-content .table-responsive .table th,
+    .modal-content .table-responsive .table td {
+        white-space: nowrap !important;
+    }
+    
+    /* Marked At column specific styling - ensure it's always visible */
+    .modal-content .table-responsive .table th:last-child,
+    .modal-content .table-responsive .table td:last-child {
+        min-width: 140px !important;
+        max-width: 180px !important;
+        white-space: nowrap !important;
+        font-size: 0.7rem !important;
+        color: #6b7280 !important;
+        text-align: left !important;
+        padding: 0.5rem 0.375rem !important;
+    }
+    
+    /* Ensure table cells don't break in Marked At column */
+    .modal-content .table-responsive .table td:last-child {
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+    
+    /* Make sure modal content wrapper allows scrolling */
+    .modal-content > div {
+        touch-action: pan-y pan-x !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .modal-content > div > div[style*="max-height: 500px"] {
+        max-height: 300px !important;
+    }
+    
+    /* Quick Stats */
+    .modal-content > div > div[style*="background: #f3f4f6"][style*="grid-template-columns: repeat(auto-fit"] {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+        padding: 0.75rem !important;
+    }
+    
+    .modal-content > div > div[style*="background: #f3f4f6"][style*="grid-template-columns: repeat(auto-fit"] strong {
+        font-size: 0.875rem;
+    }
+    
+    .modal-content > div > div[style*="background: #f3f4f6"][style*="grid-template-columns: repeat(auto-fit"] span {
+        font-size: 0.8125rem;
+    }
+    
+    .modal-close-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.25rem;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        /* Enhanced touch target */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
+        pointer-events: auto;
+    }
+    
+    .modal-close-btn:active {
+        transform: scale(0.9);
+        background: rgba(243, 244, 246, 0.95);
+    }
+    
+    /* Modal grid improvements - force single column */
+    .modal-content div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Text sizing in modal */
+    .modal-content strong {
+        font-size: 0.875rem;
+    }
+    
+    .modal-content span[style*="color: #6b7280"] {
+        font-size: 0.8125rem !important;
+    }
+    
+    /* Badge in modal */
+    .modal-content .badge {
+        font-size: 0.6875rem;
+        padding: 0.2rem 0.4rem;
+    }
+    
+    /* Info grid mobile */
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .info-item {
+        padding: 0.75rem;
+    }
+    
+    /* Button groups mobile - Recent Sessions header */
+    .section-card > div[style*="display: flex"] {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    
+    .section-card > div[style*="display: flex"] > h2 {
+        margin: 0;
+        width: 100%;
+    }
+    
+    .section-card > div[style*="display: flex"] > div[style*="display: flex"] {
+        width: 100%;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .section-card > div[style*="display: flex"] > div[style*="display: flex"] > button {
+        flex: 1;
+        min-width: 0;
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    /* WiFi form mobile */
+    .section-card > div[style*="background: #f9fafb"] {
+        padding: 0.75rem;
+    }
+    
+    /* WiFi table actions */
+    .table .btn-sm {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        min-height: 36px;
+        white-space: nowrap;
+    }
+    
+    /* Ensure action columns have minimum width */
+    .table td:nth-child(6) {
+        min-width: 100px;
     }
 }
 
@@ -800,6 +1472,172 @@ body {
     .navbar-brand {
         font-size: 1.25rem;
     }
+}
+
+/* Table-responsive wrapper - always available */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    -webkit-overflow-scrolling: touch;
+    /* Allow both vertical and horizontal scrolling */
+    touch-action: pan-y pan-x;
+    -webkit-tap-highlight-color: transparent;
+    /* Ensure touch events work */
+    pointer-events: auto;
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+}
+
+.modal-content {
+    background: white;
+    margin: 1rem auto;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    position: relative;
+    /* Allow scrolling in all directions */
+    touch-action: pan-y pan-x;
+    pointer-events: auto;
+    /* Prevent text selection issues */
+    -webkit-user-select: text;
+    user-select: text;
+    /* Enable smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 2rem);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    z-index: 10;
+    /* Touch optimizations */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-user-select: none;
+    user-select: none;
+    /* Ensure it's clickable */
+    pointer-events: auto;
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:active {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.modal-close-btn:active {
+    transform: scale(0.95);
+}
+
+/* Modal content responsive classes */
+.modal-section {
+    margin-bottom: 1.5rem;
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.modal-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.modal-stat-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.modal-stat-label {
+    font-weight: 500;
+}
+
+.modal-attendance-table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pan-x;
+    /* Ensure smooth scrolling on touch devices */
+    scroll-behavior: smooth;
+}
+
+/* Ensure all scrollable areas in modal are touch-friendly */
+.modal-content > div[style*="max-height"] {
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y pan-x !important;
+    scroll-behavior: smooth !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
 }
 
 /* Tablets and Mobile (up to 768px) */
@@ -830,35 +1668,43 @@ body {
     .navbar {
         flex-direction: row;
         justify-content: space-between;
+        flex-wrap: wrap;
     }
     
     /* Mobile-optimized tables with horizontal scroll */
     .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
         margin: 0 -1rem;
         padding: 0 1rem;
+        border-radius: 0;
     }
     
     .table {
         font-size: 0.8125rem;
-        min-width: 600px; /* Ensures table doesn't crush */
+        min-width: 800px; /* Ensures table doesn't crush - wider for more columns */
+        width: 100%;
     }
     
     .table th,
     .table td {
-        padding: 0.625rem 0.5rem;
+        padding: 0.75rem 0.5rem;
         font-size: 0.8125rem;
+        white-space: nowrap;
     }
     
     .table th {
         font-size: 0.75rem;
+        position: sticky;
+        top: 0;
+        background: var(--light-bg);
+        z-index: 5;
+        box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
     }
     
     /* Badge sizing for mobile */
     .badge {
-        padding: 0.2rem 0.5rem;
+        padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
+        white-space: nowrap;
     }
     
     /* QR Code responsive */
@@ -869,6 +1715,54 @@ body {
     /* Progress bar mobile */
     .progress-bar {
         height: 6px;
+    }
+    
+    /* Modal mobile optimization */
+    .modal-overlay {
+        padding: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .modal-content {
+        margin: 0.5rem auto;
+        padding: 1rem;
+        max-width: 100%;
+        border-radius: 8px;
+    }
+    
+    .modal-close-btn {
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 36px;
+        height: 36px;
+        font-size: 1.25rem;
+    }
+    
+    /* Button improvements for mobile */
+    .btn {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+    }
+    
+    /* Action buttons in tables */
+    .table .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8125rem;
+        min-height: 36px;
+        white-space: nowrap;
+    }
+    
+    /* Section card improvements */
+    .section-card {
+        padding: 1.25rem;
+    }
+    
+    /* Form improvements */
+    .form-group input,
+    .form-group select {
+        font-size: 16px; /* Prevents iOS zoom */
+        min-height: 48px;
     }
 }
 

@@ -5,8 +5,20 @@ let html5QrcodeScanner = null;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Dashboard page loading...');
     
-    if (!isAuthenticated() || getUserType() !== 'student') {
+    // Check authentication
+    if (!isAuthenticated()) {
         console.log('Not authenticated, redirecting to home');
+        alert('You must be logged in to access the student dashboard.');
+        window.location.href = '/';
+        return;
+    }
+    
+    // Check user type
+    const userType = getUserType();
+    if (userType !== 'student') {
+        console.error('Invalid user type for student dashboard:', userType);
+        alert('You must be logged in as a student to access this page. Please login as a student.');
+        clearAuthData();
         window.location.href = '/';
         return;
     }
@@ -41,6 +53,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show scanner instructions
     showScannerInstructions();
+    
+    // Ensure manual QR entry box is always visible and remove duplicates
+    showManualQREntry();
+    
+    // Remove any duplicate manual entry boxes on page load
+    setTimeout(() => {
+        const scannerAlert = document.getElementById('scannerAlert');
+        const manualContainer = document.getElementById('manualQRContainer');
+        
+        if (scannerAlert && manualContainer) {
+            // Find all manual entry elements in scannerAlert and remove them
+            const allManualElements = scannerAlert.querySelectorAll('[id*="manualQR"], [class*="manual"]');
+            allManualElements.forEach(el => {
+                // Make sure we're not removing elements from manualQRContainer
+                if (!manualContainer.contains(el)) {
+                    el.remove();
+                }
+            });
+        }
+        
+        // Ensure manual container is visible
+        if (manualContainer) {
+            manualContainer.style.display = 'block';
+        }
+    }, 100);
 });
 
 // Show loading state when no data is available
@@ -173,7 +210,7 @@ async function loadDashboard() {
             } else {
                 console.error('No cached data available and all API calls failed');
                 console.error('Available localStorage keys:', Object.keys(localStorage));
-                showAlert('scannerAlert', 'Failed to load student details. Please try logging in again.', 'danger');
+                showAlertPreservingManualEntry('scannerAlert', 'Failed to load student details. Please try logging in again.', 'danger');
             }
         }
     }
@@ -378,7 +415,7 @@ async function startScanner() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         // Always try mobile-friendly approach first
-        showAlert('scannerAlert', '📷 Requesting camera access...', 'info', true);
+        showAlertPreservingManualEntry('scannerAlert', '📷 Requesting camera access...', 'info');
         
         // Small delay to show message
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -429,7 +466,7 @@ async function startScanner() {
                 onScanFailure
             );
             
-            showAlert('scannerAlert', '📷 Camera active - Point at QR code', 'success', true);
+            showAlertPreservingManualEntry('scannerAlert', '📷 Camera active - Point at QR code', 'success');
             
         } catch (startError) {
             console.error('Camera start error:', startError);
@@ -451,7 +488,7 @@ async function startScanner() {
                         onScanFailure
                     );
                     
-                    showAlert('scannerAlert', '📷 Camera active - Point at QR code', 'success', true);
+                    showAlertPreservingManualEntry('scannerAlert', '📷 Camera active - Point at QR code', 'success');
                     
                 } catch (altError) {
                     console.error('Alternative camera also failed:', altError);
@@ -480,27 +517,10 @@ async function startScanner() {
             errorMessage += error.message || 'Please ensure camera access is enabled.';
         }
         
-        showAlert('scannerAlert', `❌ ${errorMessage}`, 'danger');
+        showAlertPreservingManualEntry('scannerAlert', `❌ ${errorMessage}`, 'danger');
         
-        // Show manual input option as fallback
-        setTimeout(() => {
-            const scannerAlert = document.getElementById('scannerAlert');
-            if (scannerAlert) {
-                scannerAlert.innerHTML += `
-                    <div style="padding: 15px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; margin-top: 10px;">
-                        <h4 style="margin: 0 0 10px 0; color: #1e40af;">📝 Manual QR Code Entry</h4>
-                        <p style="margin: 0 0 10px 0; color: #1e40af;">
-                            If camera is not working, you can manually enter the QR code data.
-                        </p>
-                        <input type="text" id="manualQRInput" placeholder="Enter QR code data here..." 
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
-                        <button onclick="processManualQR()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-                            Submit QR Data
-                        </button>
-                    </div>
-                `;
-            }
-        }, 2000);
+        // Ensure manual entry box is visible as fallback
+        showManualQREntry();
         
         stopScanner();
     }
@@ -529,7 +549,7 @@ async function onScanSuccess(decodedText, decodedResult) {
     await stopScanner();
     
     // Show what was scanned
-    showAlert('scannerAlert', '✓ QR Code detected! Processing...', 'success', true);
+    showAlertPreservingManualEntry('scannerAlert', '✓ QR Code detected! Processing...', 'success');
     
     // Mark attendance with scanned data
     await markAttendanceWithData(decodedText);
@@ -545,7 +565,7 @@ function onScanFailure(error) {
 // Mark attendance with QR data (works for both camera and manual)
 async function markAttendanceWithData(qrData) {
     if (!qrData) {
-        showAlert('scannerAlert', 'No QR code data provided', 'danger');
+        showAlertPreservingManualEntry('scannerAlert', 'No QR code data provided', 'danger');
         return;
     }
     
@@ -575,7 +595,7 @@ async function markAttendanceWithData(qrData) {
             longitude
         });
         
-        showAlert('scannerAlert', `✓ ${response.message} - ${response.session.subject}`, 'success');
+        showAlertPreservingManualEntry('scannerAlert', `✓ ${response.message} - ${response.session.subject}`, 'success');
         
         // Reload dashboard data
         setTimeout(() => {
@@ -583,7 +603,7 @@ async function markAttendanceWithData(qrData) {
         }, 2000);
         
     } catch (error) {
-        showAlert('scannerAlert', error.message || 'Failed to mark attendance', 'danger');
+        showAlertPreservingManualEntry('scannerAlert', error.message || 'Failed to mark attendance', 'danger');
     }
 }
 
@@ -593,42 +613,64 @@ async function markAttendanceWithData(qrData) {
 async function getWiFiInfo() {
     // Note: Browser security prevents direct WiFi SSID access
     // This would typically require a browser extension or native app
-    // For demo purposes, we'll prompt the user or use a workaround
+    // For testing, WiFi is optional - return null if not available
     
     try {
         // Attempt to get network information if available
-        if ('connection' in navigator) {
+        if ('connection' in navigator && navigator.connection) {
             // Limited network info available
-            return {
-                wifi_ssid: prompt('Please enter the WiFi network name (SSID) you are connected to:'),
-                wifi_bssid: null
-            };
+            const connection = navigator.connection;
+            console.log('Network connection info:', connection);
         }
     } catch (error) {
-        console.error('WiFi detection error:', error);
+        console.log('WiFi detection not available:', error);
     }
     
-    // Fallback: Ask user to enter manually
+    // Return null - WiFi check is optional
+    // If WiFi networks are configured, the server will prompt for it
     return {
-        wifi_ssid: prompt('Please enter the WiFi network name (SSID) you are connected to:'),
+        wifi_ssid: null,
         wifi_bssid: null
     };
 }
 
-// Mark attendance with QR data (UPDATED with WiFi validation)
+// Mark attendance with QR data (UPDATED with WiFi validation - optional)
 async function markAttendanceWithData(qrData) {
     if (!qrData) {
-        showAlert('scannerAlert', 'No QR code data provided', 'danger');
+        showAlertPreservingManualEntry('scannerAlert', 'No QR code data provided', 'danger');
+        return;
+    }
+    
+    // Verify user is authenticated as a student before marking attendance
+    if (!isAuthenticated()) {
+        showAlertPreservingManualEntry('scannerAlert', 'You are not logged in. Please login again.', 'danger');
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 2000);
+        return;
+    }
+    
+    const userType = getUserType();
+    if (userType !== 'student') {
+        showAlertPreservingManualEntry('scannerAlert', 'You must be logged in as a student to mark attendance. Please login as a student.', 'danger');
+        clearAuthData();
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 2000);
         return;
     }
     
     try {
-        // Get WiFi information
-        const wifiInfo = await getWiFiInfo();
+        // Try to get WiFi information (optional)
+        let wifi_ssid = null;
+        let wifi_bssid = null;
         
-        if (!wifiInfo.wifi_ssid) {
-            showAlert('scannerAlert', 'WiFi SSID is required to mark attendance', 'danger');
-            return;
+        try {
+            const wifiInfo = await getWiFiInfo();
+            wifi_ssid = wifiInfo?.wifi_ssid || null;
+            wifi_bssid = wifiInfo?.wifi_bssid || null;
+        } catch (wifiError) {
+            console.log('WiFi info not available, proceeding without WiFi check');
         }
         
         // Get location if available
@@ -649,17 +691,18 @@ async function markAttendanceWithData(qrData) {
             }
         }
         
-        // Mark attendance with WiFi info
+        // Mark attendance (WiFi is optional - will be checked on server if required)
         const response = await AttendanceAPI.markAttendance({
             qr_data: qrData,
             latitude,
             longitude,
-            wifi_ssid: wifiInfo.wifi_ssid,
-            wifi_bssid: wifiInfo.wifi_bssid
+            wifi_ssid: wifi_ssid,
+            wifi_bssid: wifi_bssid
         });
         
-        showAlert('scannerAlert', 
-            `✓ ${response.message} - ${response.session.subject}<br>WiFi: ${response.wifi_location}`, 
+        const wifiMsg = response.wifi_location ? `<br>WiFi: ${response.wifi_location}` : '';
+        showAlertPreservingManualEntry('scannerAlert', 
+            `✓ ${response.message} - ${response.session.subject}${wifiMsg}`, 
             'success'
         );
         
@@ -669,7 +712,45 @@ async function markAttendanceWithData(qrData) {
         }, 2000);
         
     } catch (error) {
-        showAlert('scannerAlert', error.message || 'Failed to mark attendance', 'danger');
+        console.error('Attendance marking error:', error);
+        let errorMsg = error.message || 'Failed to mark attendance';
+        
+        // The error from apiCall should already have the details
+        // But let's make sure we show helpful messages
+        if (errorMsg.includes('Unauthorized access')) {
+            // Check if it's a branch/semester mismatch or WiFi issue
+            if (errorMsg.includes('branch')) {
+                errorMsg = '❌ Branch Mismatch: ' + (errorMsg.split(':')[1] || 'This session is not for your branch');
+            } else if (errorMsg.includes('semester')) {
+                errorMsg = '❌ Semester Mismatch: ' + (errorMsg.split(':')[1] || 'This session is not for your semester');
+            } else if (errorMsg.includes('WiFi')) {
+                errorMsg = '❌ WiFi Network Issue: ' + (errorMsg.split(':')[1] || 'The WiFi network is not authorized');
+            }
+        }
+        
+        showAlertPreservingManualEntry('scannerAlert', errorMsg, 'danger');
+    }
+}
+
+// Ensure manual QR entry box is always visible and remove any duplicates
+function showManualQREntry() {
+    const manualContainer = document.getElementById('manualQRContainer');
+    if (manualContainer) {
+        // Always ensure it's visible
+        manualContainer.style.display = 'block';
+        
+        // Remove any duplicate manual entry boxes that might exist in scannerAlert
+        const scannerAlert = document.getElementById('scannerAlert');
+        if (scannerAlert) {
+            // Remove any manual entry boxes from scannerAlert (they should only be in manualQRContainer)
+            const duplicateBoxes = scannerAlert.querySelectorAll('#manualQRInfo, [id*="manualQR"]');
+            duplicateBoxes.forEach(box => {
+                // Only remove if it's not part of manualQRContainer
+                if (!manualContainer.contains(box)) {
+                    box.remove();
+                }
+            });
+        }
     }
 }
 
@@ -680,19 +761,8 @@ function showScannerInstructions() {
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    const manualEntryBlock = `
-        <div id="manualQRInfo" style="padding: 15px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; margin-bottom: 15px;">
-            <h4 style="margin: 0 0 10px 0; color: #1e40af;">📝 Manual QR Code Entry</h4>
-            <p style="margin: 0 0 10px 0; color: #1e40af;">
-                If the camera is unavailable, ask your teacher for the QR code data and enter it manually:
-            </p>
-            <input type="text" id="manualQRInput" placeholder="Enter QR code data here..." 
-                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
-            <button onclick="processManualQR()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-                Submit QR Data
-            </button>
-        </div>
-    `;
+    // Show the permanent manual entry box
+    showManualQREntry();
 
     if (isMobile) {
         scannerAlert.innerHTML = `
@@ -705,7 +775,6 @@ function showScannerInstructions() {
                     📷 Request Camera Permission
                 </button>
             </div>
-            ${manualEntryBlock}
         `;
     } else {
         scannerAlert.innerHTML = `
@@ -715,7 +784,6 @@ function showScannerInstructions() {
                     Click "Scan QR Code" to open the built-in scanner.
                 </p>
             </div>
-            ${manualEntryBlock}
         `;
     }
 }
@@ -723,7 +791,7 @@ function showScannerInstructions() {
 // Force camera permission request
 async function requestCameraPermission() {
     try {
-        showAlert('scannerAlert', '📷 Requesting camera permission...', 'info', true);
+        showAlertPreservingManualEntry('scannerAlert', '📷 Requesting camera permission...', 'info');
         
         // Try to access camera directly to trigger permission request
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -733,7 +801,7 @@ async function requestCameraPermission() {
         });
         
         // If we get here, permission was granted
-        showAlert('scannerAlert', '✅ Camera permission granted! You can now scan QR codes.', 'success', true);
+        showAlertPreservingManualEntry('scannerAlert', '✅ Camera permission granted! You can now scan QR codes.', 'success');
         
         // Stop the stream immediately (we just needed permission)
         stream.getTracks().forEach(track => track.stop());
@@ -750,13 +818,63 @@ async function requestCameraPermission() {
         console.error('Camera permission error:', error);
         
         if (error.name === 'NotAllowedError') {
-            showAlert('scannerAlert', '❌ Camera permission denied. Please allow camera access in your browser settings.', 'danger');
+            showAlertPreservingManualEntry('scannerAlert', '❌ Camera permission denied. Please allow camera access in your browser settings.', 'danger');
         } else if (error.name === 'NotFoundError') {
-            showAlert('scannerAlert', '❌ No camera found on this device.', 'danger');
+            showAlertPreservingManualEntry('scannerAlert', '❌ No camera found on this device.', 'danger');
         } else {
-            showAlert('scannerAlert', `❌ Camera error: ${error.message}`, 'danger');
+            showAlertPreservingManualEntry('scannerAlert', `❌ Camera error: ${error.message}`, 'danger');
         }
     }
+}
+
+// Improved alert function that preserves manual entry box
+function showAlertPreservingManualEntry(elementId, message, type = 'danger', duration = 5000) {
+    const alertDiv = document.getElementById(elementId);
+    if (!alertDiv) return;
+    
+    // Create alert element
+    const alertElement = document.createElement('div');
+    alertElement.className = `alert alert-${type}`;
+    alertElement.innerHTML = message;
+    alertElement.style.cssText = `
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-weight: 500;
+        animation: slideDown 0.3s ease-out;
+    `;
+    
+    // Set colors based on type
+    const colors = {
+        success: { bg: '#d1fae5', color: '#065f46', border: '#10b981' },
+        danger: { bg: '#fee2e2', color: '#991b1b', border: '#ef4444' },
+        warning: { bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+        info: { bg: '#dbeafe', color: '#1e40af', border: '#3b82f6' }
+    };
+    
+    const color = colors[type] || colors.info;
+    alertElement.style.background = color.bg;
+    alertElement.style.color = color.color;
+    alertElement.style.border = `2px solid ${color.border}`;
+    
+    // Clear existing alerts but keep manual entry box
+    const existingAlerts = alertDiv.querySelectorAll('.alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Add new alert at the beginning
+    alertDiv.insertBefore(alertElement, alertDiv.firstChild);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+        if (alertElement.parentNode) {
+            alertElement.style.animation = 'slideDown 0.3s ease-out reverse';
+            setTimeout(() => {
+                if (alertElement.parentNode) {
+                    alertElement.remove();
+                }
+            }, 300);
+        }
+    }, duration);
 }
 
 // Process manually entered QR code data
@@ -765,12 +883,12 @@ async function processManualQR() {
     const qrData = qrInput ? qrInput.value.trim() : '';
     
     if (!qrData) {
-        showAlert('scannerAlert', 'Please enter QR code data', 'danger');
+        showAlertPreservingManualEntry('scannerAlert', 'Please enter QR code data', 'danger');
         return;
     }
     
     try {
-        showAlert('scannerAlert', 'Processing QR code data...', 'info', true);
+        showAlertPreservingManualEntry('scannerAlert', 'Processing QR code data...', 'info');
         
         // Use the same attendance marking function
         await markAttendanceWithData(qrData);
@@ -782,7 +900,7 @@ async function processManualQR() {
         
     } catch (error) {
         console.error('Manual QR processing error:', error);
-        showAlert('scannerAlert', `❌ Error processing QR data: ${error.message}`, 'danger');
+        showAlertPreservingManualEntry('scannerAlert', `❌ Error processing QR data: ${error.message}`, 'danger');
     }
 }
 

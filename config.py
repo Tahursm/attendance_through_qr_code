@@ -16,20 +16,10 @@ class Config:
     DB_PORT = os.getenv('DB_PORT', '3306')
     
     # SQLAlchemy configuration
-    # For Vercel/serverless: Use environment variable or MySQL/Postgres
-    # SQLite doesn't work on serverless platforms (read-only filesystem)
-    if os.getenv('VERCEL') or os.getenv('DATABASE_URL'):
-        # On Vercel, prefer DATABASE_URL or MySQL connection
-        if os.getenv('DATABASE_URL'):
-            SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-        else:
-            # Use MySQL connection string from env vars
-            SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    else:
-        # Local development: Use SQLite for quick setup
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///attendance.db'
-        # For MySQL locally, uncomment below and configure .env:
-        # SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # MySQL configuration (using .env file)
+    SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # For SQLite (development/testing), uncomment below:
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///attendance.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # QR Code settings

@@ -40,9 +40,9 @@ Tokens are obtained after successful login and expire after 24 hours.
 ```json
 {
   "student_id": "STU2024001",
-  "full_name": "John Doe",
-  "email": "john.doe@college.edu",
-  "password": "Password123",
+  "full_name": "Rahul Sharma",
+  "email": "rahul.sharma@gmail.com",
+  "password": "student123",
   "branch": "Computer Science",
   "semester": 6,
   "year": 2024,
@@ -64,8 +64,8 @@ Tokens are obtained after successful login and expire after 24 hours.
   "student": {
     "id": 1,
     "student_id": "STU2024001",
-    "email": "john.doe@college.edu",
-    "full_name": "John Doe",
+    "email": "rahul.sharma@gmail.com",
+    "full_name": "Rahul Sharma",
     "branch": "Computer Science",
     "semester": 6,
     "year": 2024,
@@ -86,8 +86,8 @@ Tokens are obtained after successful login and expire after 24 hours.
 **Request Body:**
 ```json
 {
-  "email": "john.doe@college.edu",
-  "password": "Password123"
+  "email": "rahul.sharma@gmail.com",
+  "password": "student123"
 }
 ```
 
@@ -99,8 +99,8 @@ Tokens are obtained after successful login and expire after 24 hours.
   "student": {
     "id": 1,
     "student_id": "STU2024001",
-    "email": "john.doe@college.edu",
-    "full_name": "John Doe",
+    "email": "rahul.sharma@gmail.com",
+    "full_name": "Rahul Sharma",
     "branch": "Computer Science",
     "semester": 6,
     "year": 2024
@@ -127,8 +127,8 @@ Authorization: Bearer <student_token>
   "student": {
     "id": 1,
     "student_id": "STU2024001",
-    "email": "john.doe@college.edu",
-    "full_name": "John Doe",
+    "email": "rahul.sharma@gmail.com",
+    "full_name": "Rahul Sharma",
     "branch": "Computer Science",
     "semester": 6,
     "year": 2024,
@@ -225,7 +225,7 @@ Authorization: Bearer <student_token>
   "profile": {
     "id": 1,
     "student_id": "STU2024001",
-    "full_name": "John Doe",
+    "full_name": "Rahul Sharma",
     "branch": "Computer Science",
     "semester": 6,
     "cgpa": 8.5,
@@ -376,14 +376,14 @@ Authorization: Bearer <student_token>
     {
       "attendance_id": 1,
       "student_id": "STU2024001",
-      "student_name": "John Doe",
+      "student_name": "Rahul Sharma",
       "status": "Present",
       "marked_at": "2024-10-09T09:15:30"
     },
     {
       "attendance_id": 2,
       "student_id": "STU2024002",
-      "student_name": "Jane Smith",
+      "student_name": "Priya Patel",
       "status": "Present",
       "marked_at": "2024-10-09T09:16:45"
     }
@@ -649,7 +649,7 @@ Authorization: Bearer <student_token>
       "subject": "Data Structures",
       "session_date": "2024-10-09",
       "student_id": "STU2024001",
-      "student_name": "John Doe",
+      "student_name": "Rahul Sharma",
       "branch": "Computer Science",
       "status": "Present",
       "marked_at": "2024-10-09T09:00:03"
@@ -659,7 +659,7 @@ Authorization: Bearer <student_token>
       "subject": "Data Structures",
       "session_date": "2024-10-09",
       "student_id": "STU2024002",
-      "student_name": "Jane Smith",
+      "student_name": "Priya Patel",
       "branch": "Computer Science",
       "status": "Present",
       "marked_at": "2024-10-09T09:00:45"
@@ -740,9 +740,9 @@ curl -X POST http://localhost:5000/api/student/register \
   -H "Content-Type: application/json" \
   -d '{
     "student_id": "STU2024001",
-    "full_name": "John Doe",
-    "email": "john.doe@college.edu",
-    "password": "Password123",
+    "full_name": "Rahul Sharma",
+    "email": "rahul.sharma@gmail.com",
+    "password": "student123",
     "branch": "Computer Science",
     "semester": 6,
     "year": 2024
@@ -755,8 +755,8 @@ curl -X POST http://localhost:5000/api/student/register \
 curl -X POST http://localhost:5000/api/student/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "john.doe@college.edu",
-    "password": "Password123"
+    "email": "rahul.sharma@gmail.com",
+    "password": "student123"
   }'
 ```
 

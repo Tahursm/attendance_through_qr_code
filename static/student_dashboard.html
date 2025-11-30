@@ -129,6 +129,21 @@
                     <button id="scanBtn" class="btn btn-success scan-btn" onclick="startScanner()">
                         📷 Scan QR Code
                     </button>
+                    
+                    <!-- Manual QR Code Entry - Always Visible at Bottom -->
+                    <div id="manualQRContainer" style="display: block; margin-top: 1.5rem;">
+                        <div id="manualQRInfo" style="padding: 15px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #1e40af;">📝 Manual QR Code Entry</h4>
+                            <p style="margin: 0 0 10px 0; color: #1e40af;">
+                                If the camera is unavailable, ask your teacher for the QR code data and enter it manually:
+                            </p>
+                            <input type="text" id="manualQRInput" placeholder="Enter QR code data here..." 
+                                   style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
+                            <button onclick="processManualQR()" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                Submit QR Data
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

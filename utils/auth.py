@@ -14,8 +14,21 @@ def hash_password(password):
 
 
 def verify_password(password, password_hash):
-    """Verify a password against its hash"""
-    return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
+    """Verify a password against its hash or plain text"""
+    if not password_hash:
+        return False
+    
+    # Check if password_hash is a bcrypt hash (starts with $2b$, $2a$, etc.)
+    if password_hash.startswith('$2'):
+        # It's a bcrypt hash, verify normally
+        try:
+            return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
+        except Exception as e:
+            print(f"Error verifying bcrypt password: {e}")
+            return False
+    else:
+        # It's plain text, do simple comparison
+        return password == password_hash
 
 
 def generate_token(user_id, user_type):
@@ -68,11 +81,17 @@ def token_required(user_type=None):
             # Decode and verify token
             payload = decode_token(token)
             if not payload:
-                return jsonify({'error': 'Token is invalid or expired'}), 401
+                return jsonify({
+                    'error': 'Token is invalid or expired',
+                    'details': 'Please login again to get a new token'
+                }), 401
             
             # Check user type if specified
             if user_type and payload.get('user_type') != user_type:
-                return jsonify({'error': 'Unauthorized access'}), 403
+                return jsonify({
+                    'error': 'Unauthorized access',
+                    'details': f'This endpoint requires {user_type} access, but token is for {payload.get("user_type")}'
+                }), 403
             
             # Pass user info to route
             return f(payload, *args, **kwargs)

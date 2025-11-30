@@ -13,13 +13,39 @@ async function studentLogin() {
 
     try {
         const response = await StudentAPI.login({ email, password });
+        
+        if (!response || !response.token) {
+            showAlert('studentLoginAlert', 'Login failed: No response from server', 'danger');
+            return;
+        }
+        
         saveAuthData(response.token, 'student', response.student);
         showAlert('studentLoginAlert', 'Login successful! Redirecting...', 'success');
         setTimeout(() => {
             window.location.href = '/student/dashboard';
         }, 1000);
     } catch (error) {
-        showAlert('studentLoginAlert', error.message || 'Login failed', 'danger');
+        console.error('Student login error:', error);
+        console.error('Error type:', typeof error);
+        console.error('Error keys:', Object.keys(error || {}));
+        
+        // Extract error message from various possible formats
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (error) {
+            if (error.message) {
+                errorMessage = error.message;
+            } else if (error.error) {
+                errorMessage = error.error;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            } else if (error.toString && error.toString() !== '[object Object]') {
+                errorMessage = error.toString();
+            }
+        }
+        
+        console.error('Final error message:', errorMessage);
+        showAlert('studentLoginAlert', errorMessage, 'danger');
     }
 }
 
@@ -54,7 +80,9 @@ async function studentRegister() {
             window.location.href = '/student/dashboard';
         }, 1000);
     } catch (error) {
-        showAlert('studentLoginAlert', error.message || 'Registration failed', 'danger');
+        console.error('Student login error:', error);
+        const errorMessage = error.message || error.error || 'Login failed. Please check your credentials.';
+        showAlert('studentLoginAlert', errorMessage, 'danger');
     }
 }
 
@@ -73,13 +101,69 @@ async function teacherLogin() {
 
     try {
         const response = await TeacherAPI.login({ email, password });
+        
+        // Debug: Log the response
+        console.log('Teacher login response:', response);
+        console.log('Token in response:', response.token);
+        console.log('Teacher data in response:', response.teacher);
+        
+        // Verify response has required data
+        if (!response.token) {
+            console.error('No token in login response!', response);
+            showAlert('teacherLoginAlert', 'Login failed: No token received from server', 'danger');
+            return;
+        }
+        
+        if (!response.teacher) {
+            console.error('No teacher data in login response!', response);
+            showAlert('teacherLoginAlert', 'Login failed: No user data received from server', 'danger');
+            return;
+        }
+        
+        // Save auth data
         saveAuthData(response.token, 'teacher', response.teacher);
+        
+        // Verify it was saved
+        const savedToken = localStorage.getItem('token');
+        const savedUserType = localStorage.getItem('userType');
+        console.log('Token saved verification:', { 
+            tokenSaved: !!savedToken, 
+            tokenLength: savedToken?.length || 0,
+            userTypeSaved: savedUserType 
+        });
+        
+        if (!savedToken) {
+            console.error('Token was not saved to localStorage!');
+            showAlert('teacherLoginAlert', 'Login failed: Could not save authentication token', 'danger');
+            return;
+        }
+        
         showAlert('teacherLoginAlert', 'Login successful! Redirecting...', 'success');
         setTimeout(() => {
             window.location.href = '/teacher/dashboard';
         }, 1000);
     } catch (error) {
-        showAlert('teacherLoginAlert', error.message || 'Login failed', 'danger');
+        console.error('Teacher login error:', error);
+        console.error('Error type:', typeof error);
+        console.error('Error keys:', Object.keys(error || {}));
+        
+        // Extract error message from various possible formats
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (error) {
+            if (error.message) {
+                errorMessage = error.message;
+            } else if (error.error) {
+                errorMessage = error.error;
+            } else if (typeof error === 'string') {
+                errorMessage = error;
+            } else if (error.toString && error.toString() !== '[object Object]') {
+                errorMessage = error.toString();
+            }
+        }
+        
+        console.error('Final error message:', errorMessage);
+        showAlert('teacherLoginAlert', errorMessage, 'danger');
     }
 }
 

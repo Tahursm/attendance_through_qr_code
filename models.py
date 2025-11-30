@@ -16,6 +16,7 @@ class Student(db.Model):
     branch = db.Column(db.String(50), nullable=False)
     semester = db.Column(db.Integer, nullable=False)
     year = db.Column(db.Integer, nullable=False)
+    division = db.Column(db.String(10))
     phone = db.Column(db.String(15))
     address = db.Column(db.Text)
     date_of_birth = db.Column(db.Date)
@@ -41,6 +42,7 @@ class Student(db.Model):
             'branch': self.branch,
             'semester': self.semester,
             'year': self.year,
+            'division': self.division,
             'phone': self.phone,
             'address': self.address,
             'date_of_birth': self.date_of_birth.isoformat() if self.date_of_birth else None,
@@ -109,6 +111,7 @@ class Session(db.Model):
     subject = db.Column(db.String(100), nullable=False)
     branch = db.Column(db.String(50), nullable=False)
     semester = db.Column(db.Integer, nullable=False)
+    division = db.Column(db.String(10))
     session_date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time)
@@ -131,6 +134,7 @@ class Session(db.Model):
             'subject': self.subject,
             'branch': self.branch,
             'semester': self.semester,
+            'division': self.division,
             'session_date': self.session_date.isoformat() if self.session_date else None,
             'start_time': self.start_time.isoformat() if self.start_time else None,
             'end_time': self.end_time.isoformat() if self.end_time else None,

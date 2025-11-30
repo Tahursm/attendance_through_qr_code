@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 from config import config
 from models import db
+from sqlalchemy import text
 import os
 import ssl
 
@@ -18,6 +19,16 @@ def create_app(config_name='development'):
     # Load configuration
     app.config.from_object(config[config_name])
     
+    # Disable caching for static files in development
+    if config_name == 'development':
+        @app.after_request
+        def add_no_cache_header(response):
+            if request.endpoint and 'static' in request.endpoint:
+                response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response.headers['Pragma'] = 'no-cache'
+                response.headers['Expires'] = '0'
+            return response
+    
     # Enable CORS
     CORS(app, resources={r"/api/*": {"origins": "*"}})
     
@@ -32,7 +43,29 @@ def create_app(config_name='development'):
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
     def health_check():
-        return jsonify({'status': 'healthy', 'message': 'API is running'}), 200
+        """Health check endpoint that tests database connectivity"""
+        try:
+            # Test database connection
+            db.session.execute(text('SELECT 1'))
+            db_status = 'connected'
+            db_error = None
+        except Exception as e:
+            db_status = 'disconnected'
+            db_error = str(e)
+        
+        if db_status == 'connected':
+            return jsonify({
+                'status': 'healthy',
+                'message': 'API is running',
+                'database': 'connected'
+            }), 200
+        else:
+            return jsonify({
+                'status': 'unhealthy',
+                'message': 'API is running but database is not accessible',
+                'database': 'disconnected',
+                'error': db_error
+            }), 503
     
     # Serve frontend pages
     @app.route('/')

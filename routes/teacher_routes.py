@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from models import db, Teacher, Session, Attendance, Student, LessonPlan, WiFiNetwork
 from utils.auth import verify_password, generate_token, token_required
 from datetime import datetime, date, time
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 teacher_bp = Blueprint('teacher', __name__)
 
@@ -13,16 +13,49 @@ def login_teacher():
     try:
         data = request.get_json()
         
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
         email = data.get('email')
         password = data.get('password')
         
         if not email or not password:
             return jsonify({'error': 'Email and password are required'}), 400
         
-        # Find teacher
-        teacher = Teacher.query.filter_by(email=email).first()
+        # Test database connection first
+        try:
+            db.session.execute(text('SELECT 1'))
+        except Exception as db_error:
+            import traceback
+            print(f"Database connection error: {str(db_error)}")
+            print(traceback.format_exc())
+            return jsonify({
+                'error': 'Database connection failed',
+                'details': 'The server cannot connect to the database. Please check if the database server is running and accessible.',
+                'technical': str(db_error)
+            }), 503
         
-        if not teacher or not verify_password(password, teacher.password_hash):
+        # Find teacher
+        try:
+            teacher = Teacher.query.filter_by(email=email).first()
+        except Exception as query_error:
+            import traceback
+            print(f"Database query error: {str(query_error)}")
+            print(traceback.format_exc())
+            return jsonify({
+                'error': 'Database query failed',
+                'details': 'The server encountered an error while querying the database.',
+                'technical': str(query_error)
+            }), 503
+        
+        if not teacher:
+            return jsonify({'error': 'Invalid email or password'}), 401
+        
+        if not teacher.password_hash:
+            return jsonify({'error': 'Account error: No password set'}), 401
+        
+        # Verify password
+        if not verify_password(password, teacher.password_hash):
             return jsonify({'error': 'Invalid email or password'}), 401
         
         # Generate token
@@ -35,6 +68,9 @@ def login_teacher():
         }), 200
         
     except Exception as e:
+        import traceback
+        print(f"Teacher login error: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
 
 
@@ -204,12 +240,12 @@ def get_teacher_dashboard_stats(current_user):
                 'attendance_rate': round(attendance_rate, 2)
             })
         
-        # Get recent sessions
+        # Get recent sessions (ordered by creation time desc to get most recent first)
         recent_sessions = Session.query.filter_by(
             teacher_id=teacher_id
         ).order_by(
-            Session.session_date.desc()
-        ).limit(5).all()
+            Session.id.desc()
+        ).limit(10).all()
         
         recent_sessions_data = [session.to_dict() for session in recent_sessions]
         

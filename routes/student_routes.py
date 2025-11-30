@@ -3,7 +3,7 @@ from models import db, Student, Attendance, Session
 from utils.auth import hash_password, verify_password, generate_token, token_required
 from utils.validators import validate_registration_data, validate_email
 from utils.audit_logger import log_security_event
-from sqlalchemy import func
+from sqlalchemy import func, case
 from datetime import datetime
 
 student_bp = Blueprint('student', __name__)
@@ -72,6 +72,9 @@ def login_student():
     try:
         data = request.get_json()
         
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
         email = data.get('email')
         password = data.get('password')
         
@@ -81,7 +84,14 @@ def login_student():
         # Find student
         student = Student.query.filter_by(email=email).first()
         
-        if not student or not verify_password(password, student.password_hash):
+        if not student:
+            return jsonify({'error': 'Invalid email or password'}), 401
+        
+        if not student.password_hash:
+            return jsonify({'error': 'Account error: No password set'}), 401
+        
+        # Verify password
+        if not verify_password(password, student.password_hash):
             return jsonify({'error': 'Invalid email or password'}), 401
         
         # Generate token
@@ -94,6 +104,9 @@ def login_student():
         }), 200
         
     except Exception as e:
+        import traceback
+        print(f"Student login error: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
 
 
@@ -217,7 +230,7 @@ def get_dashboard_stats(current_user):
         subject_attendance = db.session.query(
             Session.subject,
             func.count(Attendance.id).label('total'),
-            func.sum(func.case((Attendance.status == 'Present', 1), else_=0)).label('present')
+            func.sum(case((Attendance.status == 'Present', 1), else_=0)).label('present')
         ).join(
             Attendance, Session.id == Attendance.session_id
         ).filter(

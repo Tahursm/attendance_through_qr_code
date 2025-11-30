@@ -65,16 +65,23 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    // Clone the response before caching
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
+                    // Only cache GET requests, not POST/PUT/DELETE
+                    if (request.method === 'GET') {
+                        // Clone the response before caching
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(request, responseClone);
+                        });
+                    }
                     return response;
                 })
                 .catch(() => {
-                    // Return cached API response if network fails
-                    return caches.match(request);
+                    // Only return cached response for GET requests
+                    if (request.method === 'GET') {
+                        return caches.match(request);
+                    }
+                    // For POST/PUT/DELETE, return network error
+                    return new Response('Network error', { status: 503 });
                 })
         );
         return;

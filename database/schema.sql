@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS students (
     branch VARCHAR(50) NOT NULL,
     semester INT NOT NULL,
     year INT NOT NULL,
+    division VARCHAR(10),
     phone VARCHAR(15),
     address TEXT,
     date_of_birth DATE,
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     subject VARCHAR(100) NOT NULL,
     branch VARCHAR(50) NOT NULL,
     semester INT NOT NULL,
+    division VARCHAR(10),
     session_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME,
@@ -128,12 +130,34 @@ CREATE TABLE IF NOT EXISTS wifi_networks (
 
 -- Insert Sample Data for Testing
 
--- Sample Students
-INSERT INTO students (student_id, email, password_hash, full_name, branch, semester, year, phone, gender, admission_date, fee_status, total_fee, paid_fee, backlogs, cgpa) VALUES
-('STU2024001', 'john.doe@college.edu', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYqJNvUw2wG', 'John Doe', 'Computer Science', 6, 2024, '9876543210', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.5),
-('STU2024002', 'jane.smith@college.edu', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYqJNvUw2wG', 'Jane Smith', 'Computer Science', 6, 2024, '9876543211', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 1, 7.8),
-('STU2024003', 'alex.johnson@college.edu', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYqJNvUw2wG', 'Alex Johnson', 'Information Technology', 4, 2024, '9876543212', 'Male', '2022-08-01', 'Partial', 50000.00, 30000.00, 2, 7.2),
-('STU2024004', 'emily.brown@college.edu', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYqJNvUw2wG', 'Emily Brown', 'Electronics', 2, 2024, '9876543213', 'Female', '2023-08-01', 'Pending', 50000.00, 0.00, 0, 8.9);
+-- Sample Students (Indian Names with Plain Text Passwords)
+-- Division A Students (10 students)
+-- Password for all students: student123
+INSERT INTO students (student_id, email, password_hash, full_name, branch, semester, year, division, phone, gender, admission_date, fee_status, total_fee, paid_fee, backlogs, cgpa) VALUES
+('STU2024001', 'rahul.sharma@gmail.com', 'student123', 'Rahul Sharma', 'Computer Science', 6, 2024, 'Division A', '9876543210', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.5),
+('STU2024002', 'priya.patel@gmail.com', 'student123', 'Priya Patel', 'Computer Science', 6, 2024, 'Division A', '9876543211', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 1, 7.8),
+('STU2024003', 'arjun.kumar@gmail.com', 'student123', 'Arjun Kumar', 'Computer Science', 6, 2024, 'Division A', '9876543212', 'Male', '2021-08-01', 'Partial', 50000.00, 30000.00, 2, 7.2),
+('STU2024004', 'ananya.singh@gmail.com', 'student123', 'Ananya Singh', 'Computer Science', 6, 2024, 'Division A', '9876543213', 'Female', '2021-08-01', 'Pending', 50000.00, 0.00, 0, 8.9),
+('STU2024005', 'vishal.gupta@gmail.com', 'student123', 'Vishal Gupta', 'Computer Science', 6, 2024, 'Division A', '9876543214', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.2),
+('STU2024006', 'kavya.reddy@gmail.com', 'student123', 'Kavya Reddy', 'Computer Science', 6, 2024, 'Division A', '9876543215', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 1, 7.5),
+('STU2024007', 'rohan.malhotra@gmail.com', 'student123', 'Rohan Malhotra', 'Computer Science', 6, 2024, 'Division A', '9876543216', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.7),
+('STU2024008', 'diya.jain@gmail.com', 'student123', 'Diya Jain', 'Computer Science', 6, 2024, 'Division A', '9876543217', 'Female', '2021-08-01', 'Partial', 50000.00, 25000.00, 0, 8.0),
+('STU2024009', 'aditya.verma@gmail.com', 'student123', 'Aditya Verma', 'Computer Science', 6, 2024, 'Division A', '9876543218', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 2, 7.3),
+('STU2024010', 'meera.shah@gmail.com', 'student123', 'Meera Shah', 'Computer Science', 6, 2024, 'Division A', '9876543219', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.4);
+
+-- Division B Students (10 students)
+-- Password for all students: student123
+INSERT INTO students (student_id, email, password_hash, full_name, branch, semester, year, division, phone, gender, admission_date, fee_status, total_fee, paid_fee, backlogs, cgpa) VALUES
+('STU2024011', 'karan.desai@gmail.com', 'student123', 'Karan Desai', 'Computer Science', 6, 2024, 'Division B', '9876543220', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.6),
+('STU2024012', 'neha.mehta@gmail.com', 'student123', 'Neha Mehta', 'Computer Science', 6, 2024, 'Division B', '9876543221', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 1, 7.9),
+('STU2024013', 'siddharth.agarwal@gmail.com', 'student123', 'Siddharth Agarwal', 'Computer Science', 6, 2024, 'Division B', '9876543222', 'Male', '2021-08-01', 'Partial', 50000.00, 40000.00, 0, 8.1),
+('STU2024014', 'isha.bansal@gmail.com', 'student123', 'Isha Bansal', 'Computer Science', 6, 2024, 'Division B', '9876543223', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.8),
+('STU2024015', 'aman.kapoor@gmail.com', 'student123', 'Aman Kapoor', 'Computer Science', 6, 2024, 'Division B', '9876543224', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 2, 7.4),
+('STU2024016', 'tanvi.chopra@gmail.com', 'student123', 'Tanvi Chopra', 'Computer Science', 6, 2024, 'Division B', '9876543225', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.3),
+('STU2024017', 'yash.tiwari@gmail.com', 'student123', 'Yash Tiwari', 'Computer Science', 6, 2024, 'Division B', '9876543226', 'Male', '2021-08-01', 'Partial', 50000.00, 35000.00, 1, 7.6),
+('STU2024018', 'riya.bhatia@gmail.com', 'student123', 'Riya Bhatia', 'Computer Science', 6, 2024, 'Division B', '9876543227', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.5),
+('STU2024019', 'harsh.saxena@gmail.com', 'student123', 'Harsh Saxena', 'Computer Science', 6, 2024, 'Division B', '9876543228', 'Male', '2021-08-01', 'Paid', 50000.00, 50000.00, 0, 8.2),
+('STU2024020', 'pooja.mishra@gmail.com', 'student123', 'Pooja Mishra', 'Computer Science', 6, 2024, 'Division B', '9876543229', 'Female', '2021-08-01', 'Paid', 50000.00, 50000.00, 1, 7.7);
 
 -- Sample Teachers (password: "password123" for all)
 INSERT INTO teachers (teacher_id, email, password_hash, full_name, branch, designation, qualification, phone, gender, joining_date, experience_years, specialization) VALUES

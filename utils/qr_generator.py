@@ -24,9 +24,10 @@ def generate_qr_data(teacher_id, session_id, session_db_id):
     # Generate unique token
     qr_token = generate_random_token(64)  # Longer token for better security
     
-    # Calculate expiry time (2-5 minutes as per requirements)
+    # Calculate expiry time (from config)
+    from config import Config
     token_generated_at = datetime.utcnow()
-    expires_at = token_generated_at + timedelta(minutes=3)  # 3 minutes expiry
+    expires_at = token_generated_at + timedelta(seconds=Config.QR_TOKEN_EXPIRY)
     
     # Create secure payload with encryption
     payload = {

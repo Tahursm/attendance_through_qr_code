@@ -13,16 +13,18 @@ with app.app_context():
     
     print("Creating tables...")
     
-    # Create sample students
+    # Create sample students (Indian names with plain text passwords)
+    # Note: Using plain text 'student123' instead of hashed password
     students = [
         Student(
             student_id='STU2024001',
-            email='john.doe@college.edu',
-            password_hash=hash_password('password123'),
-            full_name='John Doe',
+            email='rahul.sharma@gmail.com',
+            password_hash='student123',  # Plain text password
+            full_name='Rahul Sharma',
             branch='Computer Science',
             semester=6,
             year=2024,
+            division='Division A',
             phone='9876543210',
             gender='Male',
             admission_date=date(2021, 8, 1),
@@ -34,12 +36,13 @@ with app.app_context():
         ),
         Student(
             student_id='STU2024002',
-            email='jane.smith@college.edu',
-            password_hash=hash_password('password123'),
-            full_name='Jane Smith',
+            email='priya.patel@gmail.com',
+            password_hash='student123',  # Plain text password
+            full_name='Priya Patel',
             branch='Computer Science',
             semester=6,
             year=2024,
+            division='Division A',
             phone='9876543211',
             gender='Female',
             admission_date=date(2021, 8, 1),
@@ -51,15 +54,16 @@ with app.app_context():
         ),
         Student(
             student_id='STU2024003',
-            email='alex.johnson@college.edu',
-            password_hash=hash_password('password123'),
-            full_name='Alex Johnson',
-            branch='Information Technology',
-            semester=4,
+            email='arjun.kumar@gmail.com',
+            password_hash='student123',  # Plain text password
+            full_name='Arjun Kumar',
+            branch='Computer Science',
+            semester=6,
             year=2024,
+            division='Division A',
             phone='9876543212',
             gender='Male',
-            admission_date=date(2022, 8, 1),
+            admission_date=date(2021, 8, 1),
             fee_status='Partial',
             total_fee=50000.00,
             paid_fee=30000.00,
@@ -68,15 +72,16 @@ with app.app_context():
         ),
         Student(
             student_id='STU2024004',
-            email='emily.brown@college.edu',
-            password_hash=hash_password('password123'),
-            full_name='Emily Brown',
-            branch='Electronics',
-            semester=2,
+            email='ananya.singh@gmail.com',
+            password_hash='student123',  # Plain text password
+            full_name='Ananya Singh',
+            branch='Computer Science',
+            semester=6,
             year=2024,
+            division='Division A',
             phone='9876543213',
             gender='Female',
-            admission_date=date(2023, 8, 1),
+            admission_date=date(2021, 8, 1),
             fee_status='Pending',
             total_fee=50000.00,
             paid_fee=0.00,
@@ -142,9 +147,9 @@ with app.app_context():
     
     print("[OK] Database initialized successfully!")
     print("\nSample Accounts Created:")
-    print("\nSTUDENTS (password: password123)")
+    print("\nSTUDENTS (password: student123)")
     for student in students:
-        print(f"   - {student.email}")
+        print(f"   - {student.email} ({student.full_name})")
     
     print("\nTEACHERS (password: password123)")
     for teacher in teachers:
