@@ -16,10 +16,20 @@ class Config:
     DB_PORT = os.getenv('DB_PORT', '3306')
     
     # SQLAlchemy configuration
-    # MySQL configuration (using .env file)
-    SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    # For SQLite (development/testing), uncomment below:
-    # SQLALCHEMY_DATABASE_URI = 'sqlite:///attendance.db'
+    # Check if using PostgreSQL (Render, Railway) or MySQL
+    _database_url = os.getenv('DATABASE_URL')
+    if _database_url:  # PostgreSQL connection string (Render, Railway)
+        # Handle both postgres:// and postgresql:// URLs
+        if _database_url.startswith('postgres://'):
+            SQLALCHEMY_DATABASE_URI = _database_url.replace('postgres://', 'postgresql://', 1)
+        else:
+            SQLALCHEMY_DATABASE_URI = _database_url
+    elif os.getenv('DB_HOST') and os.getenv('DB_HOST') != 'localhost':
+        # MySQL configuration (using .env file)
+        SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    else:
+        # For SQLite (development/testing)
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///attendance.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # QR Code settings

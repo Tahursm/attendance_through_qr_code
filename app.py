@@ -105,17 +105,30 @@ def create_ssl_context():
         return None
 
 
-if __name__ == '__main__':
-    app = create_app()
+# Create app instance for gunicorn and production deployment
+try:
+    config_name = os.getenv('FLASK_ENV', 'production')
+    app = create_app(config_name)
     
-    # Create tables if they don't exist
+    # Initialize database tables on startup
     with app.app_context():
         try:
             db.create_all()
             print("Database tables created successfully!")
         except Exception as e:
-            print(f"Error creating tables: {e}")
-    
+            print(f"Warning: Error creating tables: {e}")
+            print("App will continue without database initialization")
+except Exception as e:
+    print(f"FATAL ERROR: Failed to create app: {e}")
+    import traceback
+    traceback.print_exc()
+    # Create a minimal app so gunicorn doesn't fail completely
+    app = Flask(__name__)
+    @app.route('/')
+    def error():
+        return jsonify({'error': 'Application initialization failed', 'details': str(e)}), 500
+
+if __name__ == '__main__':
     # Check if SSL is enabled
     ssl_enabled = app.config.get('SSL_ENABLED', False)
     ssl_context = None
