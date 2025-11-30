@@ -12,9 +12,11 @@ This means gunicorn is **NOT being installed** during the build, even though it'
 2. Click on your service: **attendance-qr-app**
 3. Click **Settings** tab (left sidebar)
 4. Find **Build Command** section
-5. **DELETE everything** in the Build Command field (leave it EMPTY)
-   - This lets Render auto-detect and install from requirements.txt
-   - OR set it to: `pip install -r requirements.txt`
+5. **Set Build Command to:**
+   ```
+   pip install --upgrade pip && pip install -r requirements.txt && pip install gunicorn==21.2.0 psycopg2-binary==2.9.9
+   ```
+   This explicitly installs gunicorn and psycopg2-binary which seem to be skipped
 6. Click **Save Changes**
 
 ### Step 2: Update Start Command
